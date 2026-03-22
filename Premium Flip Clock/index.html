@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Premium Flip Clock | Realistic Page Turn Effect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f0f4fa 0%, #e2e8f0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', 'Poppins', 'Segoe UI', system-ui, sans-serif;
+      padding: 20px;
+    }
+
+    /* Main container with floating card effect */
+    .flip-clock {
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(4px);
+      border-radius: 48px;
+      padding: 28px 36px;
+      box-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .clock-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .time-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Colon styling */
+    .colon {
+      font-size: 56px;
+      font-weight: 500;
+      color: #1e293b;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      line-height: 1;
+      font-family: monospace;
+      margin: 0 4px;
+    }
+
+    /* Flip card container */
+    .flip-card {
+      position: relative;
+      width: 90px;
+      height: 120px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      perspective: 400px;
+    }
+
+    /* Top and bottom halves - each shows only half of the digit */
+    .card-top, .card-bottom {
+      position: relative;
+      height: 50%;
+      overflow: hidden;
+      background: #ffffff;
+      font-weight: 800;
+      font-size: 72px;
+      color: #0f172a;
+      letter-spacing: 2px;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card-top {
+      border-radius: 18px 18px 0 0;
+      border-bottom: 2px solid #eef2f8;
+      box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.02);
+    }
+
+    .card-bottom {
+      border-radius: 0 0 18px 18px;
+      border-top: 1px solid #eef2f8;
+    }
+
+    /* The actual digit text - positioned to show only the relevant half */
+    .card-top span, .card-bottom span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      line-height: 120px;  /* full card height */
+      transition: none;
+    }
+
+    .card-top span {
+      top: 0;
+    }
+
+    .card-bottom span {
+      bottom: 0;
+    }
+
+    /* ---------- BOOK PAGE TURN ANIMATION ---------- */
+    .flip-card.flipping .card-top {
+      animation: pageTurn 0.55s cubic-bezier(0.25, 0.94, 0.35, 1.02) forwards;
+      transform-origin: center bottom;
+      will-change: transform;
+    }
+
+    /* Add shadow during flip */
+    .flip-card.flipping {
+      box-shadow: 0 0 0 2px rgba(255, 250, 225, 0.5), 0 20px 30px -12px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes pageTurn {
+      0% {
+        transform: rotateX(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: rotateX(-96deg);
+        opacity: 0.92;
+      }
+    }
+
+    /* Subtle bottom reveal */
+    .flip-card.flipping .card-bottom {
+      animation: bottomReveal 0.28s ease-out 0.22s forwards;
+    }
+
+    @keyframes bottomReveal {
+      0% {
+        transform: translateY(3px);
+        opacity: 0.94;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Paper reflection */
+    .flip-card.flipping .card-top::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(255, 245, 220, 0.3) 0%, rgba(255, 255, 255, 0) 80%);
+      pointer-events: none;
+      border-radius: 16px 16px 0 0;
+    }
+
+    /* AM/PM pill */
+    .ampm-badge {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 10px 20px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #1e293b;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      font-family: monospace;
+      letter-spacing: 1px;
+      margin-left: 16px;
+      border: 1px solid rgba(255, 255, 245, 0.7);
+    }
+
+    /* Responsive */
+    @media (max-width: 780px) {
+      .flip-clock {
+        padding: 20px 24px;
+      }
+      .flip-card {
+        width: 70px;
+        height: 96px;
+      }
+      .card-top, .card-bottom {
+        font-size: 56px;
+      }
+      .card-top span, .card-bottom span {
+        line-height: 96px;
+      }
+      .colon {
+        font-size: 44px;
+      }
+      .ampm-badge {
+        font-size: 0.95rem;
+        padding: 7px 14px;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .flip-card {
+        width: 56px;
+        height: 78px;
+      }
+      .card-top, .card-bottom {
+        font-size: 44px;
+      }
+      .card-top span, .card-bottom span {
+        line-height: 78px;
+      }
+      .colon {
+        font-size: 34px;
+      }
+      .ampm-badge {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+      }
+      .flip-clock {
+        padding: 14px 18px;
+      }
+    }
+
+    /* Entrance animation */
+    @keyframes gentleAppear {
+      0% { opacity: 0; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .flip-clock {
+      animation: gentleAppear 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+  </style>
+</head>
+<body>
+<div class="flip-clock">
+  <div class="clock-container">
+    <!-- HOURS -->
+    <div class="time-group">
+      <div class="flip-card" id="hour-tens"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+      <div class="flip-card" id="hour-units"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+    </div>
+    <div class="colon">:</div>
+    <!-- MINUTES -->
+    <div class="time-group">
+      <div class="flip-card" id="minute-tens"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+      <div class="flip-card" id="minute-units"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+    </div>
+    <div class="colon">:</div>
+    <!-- SECONDS (flip every second) -->
+    <div class="time-group">
+      <div class="flip-card" id="second-tens"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+      <div class="flip-card" id="second-units"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+    </div>
+    <div class="ampm-badge" id="ampm-label">AM</div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // DOM references
+    const digits = {
+      hourTens: document.getElementById('hour-tens'),
+      hourUnits: document.getElementById('hour-units'),
+      minuteTens: document.getElementById('minute-tens'),
+      minuteUnits: document.getElementById('minute-units'),
+      secondTens: document.getElementById('second-tens'),
+      secondUnits: document.getElementById('second-units')
+    };
+    const ampmSpan = document.getElementById('ampm-label');
+
+    // Current displayed digit values (string)
+    let currentValues = {
+      hourTens: '0', hourUnits: '0',
+      minuteTens: '0', minuteUnits: '0',
+      secondTens: '0', secondUnits: '0'
+    };
+
+    // Helper: set digit text without animation (static)
+    function setDigitStatic(card, newDigit) {
+      const topSpan = card.querySelector('.card-top span');
+      const bottomSpan = card.querySelector('.card-bottom span');
+      if (topSpan && bottomSpan) {
+        topSpan.textContent = newDigit;
+        bottomSpan.textContent = newDigit;
+      }
+    }
+
+    // Animate a single digit card with page-turn effect
+    function flipCard(card, newDigit) {
+      return new Promise((resolve) => {
+        // Prevent overlapping animations
+        if (card.classList.contains('flipping')) {
+          // If already flipping, wait for its end then update
+          const onFinish = () => {
+            card.removeEventListener('animationend', onFinish);
+            if (card.classList.contains('flipping')) {
+              setTimeout(() => {
+                card.classList.remove('flipping');
+                setDigitStatic(card, newDigit);
+                resolve();
+              }, 50);
+            } else {
+              setDigitStatic(card, newDigit);
+              resolve();
+            }
+          };
+          card.addEventListener('animationend', onFinish, { once: true });
+          return;
+        }
+
+        // Start flip
+        card.classList.add('flipping');
+        const topElem = card.querySelector('.card-top');
+
+        const onFlipComplete = () => {
+          topElem.removeEventListener('animationend', onFlipComplete);
+          setDigitStatic(card, newDigit);
+          card.classList.remove('flipping');
+          resolve();
+        };
+
+        topElem.addEventListener('animationend', onFlipComplete, { once: true });
+
+        // Safety timeout (in case animationend doesn't fire)
+        setTimeout(() => {
+          if (card.classList.contains('flipping')) {
+            topElem.removeEventListener('animationend', onFlipComplete);
+            setDigitStatic(card, newDigit);
+            card.classList.remove('flipping');
+            resolve();
+          }
+        }, 600);
+      });
+    }
+
+    // Main clock update
+    let isUpdating = false;
+    async function refreshClock() {
+      if (isUpdating) return;
+      isUpdating = true;
+
+      const now = new Date();
+      let hours24 = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
+      // 12-hour format
+      let hours12 = hours24 % 12;
+      if (hours12 === 0) hours12 = 12;
+      const hourStr = hours12.toString().padStart(2, '0');
+      const minuteStr = minutes.toString().padStart(2, '0');
+      const secondStr = seconds.toString().padStart(2, '0');
+      const ampm = hours24 < 12 ? 'AM' : 'PM';
+
+      // Update AM/PM if changed
+      if (ampmSpan.textContent !== ampm) ampmSpan.textContent = ampm;
+
+      const newDigits = {
+        hourTens: hourStr[0],
+        hourUnits: hourStr[1],
+        minuteTens: minuteStr[0],
+        minuteUnits: minuteStr[1],
+        secondTens: secondStr[0],
+        secondUnits: secondStr[1]
+      };
+
+      const keys = ['hourTens', 'hourUnits', 'minuteTens', 'minuteUnits', 'secondTens', 'secondUnits'];
+      const flipPromises = [];
+
+      for (const key of keys) {
+        const newVal = newDigits[key];
+        if (currentValues[key] !== newVal) {
+          const card = digits[key];
+          if (card) {
+            const promise = flipCard(card, newVal).then(() => {
+              currentValues[key] = newVal;
+            });
+            flipPromises.push(promise);
+          } else {
+            if (card) setDigitStatic(card, newVal);
+            currentValues[key] = newVal;
+          }
+        }
+      }
+
+      if (flipPromises.length > 0) {
+        await Promise.all(flipPromises);
+      } else {
+        // Ensure consistency (no drift)
+        for (const key of keys) {
+          if (currentValues[key] !== newDigits[key]) {
+            const card = digits[key];
+            if (card) setDigitStatic(card, newDigits[key]);
+            currentValues[key] = newDigits[key];
+          }
+        }
+      }
+
+      isUpdating = false;
+    }
+
+    // Initial static load
+    function setInitialTime() {
+      const now = new Date();
+      let hours24 = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      let hours12 = hours24 % 12;
+      if (hours12 === 0) hours12 = 12;
+      const hourStr = hours12.toString().padStart(2, '0');
+      const minuteStr = minutes.toString().padStart(2, '0');
+      const secondStr = seconds.toString().padStart(2, '0');
+      const ampm = hours24 < 12 ? 'AM' : 'PM';
+      ampmSpan.textContent = ampm;
+
+      const initDigits = {
+        hourTens: hourStr[0], hourUnits: hourStr[1],
+        minuteTens: minuteStr[0], minuteUnits: minuteStr[1],
+        secondTens: secondStr[0], secondUnits: secondStr[1]
+      };
+      for (const [key, val] of Object.entries(initDigits)) {
+        const card = digits[key];
+        if (card) setDigitStatic(card, val);
+        currentValues[key] = val;
+      }
+    }
+
+    // Start timer aligned to next second
+    let timer = null;
+    function startClock() {
+      setInitialTime();
+      const now = new Date();
+      const delay = 1000 - now.getMilliseconds();
+      setTimeout(() => {
+        refreshClock(); // first update exactly at second boundary
+        timer = setInterval(refreshClock, 1000);
+      }, delay);
+    }
+
+    startClock();
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (timer) clearInterval(timer);
+    });
+  })();
+</script>
+</body>
+</html>
